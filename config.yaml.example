@@ -1,0 +1,37 @@
+# JD_COOKIE 管理系统配置文件
+
+# 服务器配置
+server:
+  host: 0.0.0.0
+  port: 8080
+  debug: true
+  updateUrl: "http://localhost:8082"
+
+# 环境变量配置
+environment:
+  # QL 配置
+  QL_HOST: ""
+  CLIENT_ID: ""
+  CLIENT_SECRET: ""
+  
+  # 管理员配置
+  ADMIN_USERNAME: "admin"
+  ADMIN_PASSWORD: "admin123"
+  
+  # 安全配置
+  SECRET_KEY: "default_secret_key_for_development"
+  
+  # 访问限制配置
+  MAX_DAILY_ACCESS: 7
+  
+  # 背景图配置
+  BACKGROUND_IMAGE_URL: "https://t.alcy.cc/ycy"
+
+# 邮件系统配置
+email:
+  enabled: false
+  smtpServer: ""
+  smtpPort: 587
+  smtpUser: ""
+  smtpPass: ""
+  checkTime: "08:00"

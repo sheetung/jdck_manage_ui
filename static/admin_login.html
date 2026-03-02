@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员登录 - JD_COOKIE 管理系统</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* 背景遮罩层 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: -1;
+        }
+        
+        /* 容器样式 - 苹果系统风格玻璃透明效果 */
+        .container {
+            max-width: 400px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        
+        .container:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
+        }
+        
+        /* 标题样式 */
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 24px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-color: #fafafa;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: white;
+            box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* 按钮样式 */
+        button {
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.5s ease;
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* 结果显示样式 */
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+        }
+        
+        .result-error {
+            border-color: rgba(244, 67, 54, 0.5);
+            background: rgba(244, 67, 54, 0.1);
+        }
+        
+        .result-message {
+            font-size: 14px;
+            line-height: 1.6;
+            text-align: center;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                align-items: flex-start;
+            }
+
+            .container {
+                margin: 20px 0;
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            button {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+        }
+        
+        /* 版权信息样式 */
+        .copyright {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 12px;
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>管理员登录</h2>
+    
+    <div class="form-group">
+        <label for="username">用户名:</label>
+        <input type="text" id="username" placeholder="请输入管理员用户名">
+    </div>
+    
+    <div class="form-group">
+        <label for="password">密码:</label>
+        <input type="password" id="password" placeholder="请输入管理员密码">
+    </div>
+
+    <button id="loginBtn" onclick="login()">登录</button>
+    <div id="result" class="result-container"></div>
+    
+    <!-- 版权信息 -->
+    <div class="copyright">
+        &copy; 2025 sheetung. All rights reserved.
+    </div>
+</div>
+
+<script>
+    // 页面加载时设置背景图
+    async function loadConfig() {
+        try {
+            const res = await fetch("/api/config");
+            const data = await res.json();
+            if (data.code === 200 && data.data.backgroundImageUrl) {
+                document.body.style.backgroundImage = `url('${data.data.backgroundImageUrl}')`;
+            }
+        } catch (err) {
+            console.error('加载配置失败:', err);
+            // 使用默认背景图
+            document.body.style.backgroundImage = "url('https://t.alcy.cc/ycy')";
+        }
+    }
+
+    // 立即执行配置加载
+    loadConfig();
+
+    const loginBtn = document.getElementById("loginBtn");
+    const result = document.getElementById("result");
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+
+    // 初始化结果区域
+    result.style.display = 'none';
+
+    // 登录功能
+    async function login() {
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
+        
+        // 清空之前的结果
+        result.innerHTML = '';
+        result.classList.remove('result-error');
+        result.style.display = 'none';
+        
+        // 输入验证
+        if (!username || !password) {
+            showResult('error', '用户名和密码不能为空');
+            return;
+        }
+
+        // 显示加载状态
+        loginBtn.disabled = true;
+        showResult('info', '<div class="loading-spinner"></div> 正在登录...');
+
+        try {
+            const res = await fetch("/api/admin/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+            
+            const data = await res.json();
+            
+            if (data.code === 200) {
+                // 登录成功，跳转到管理员页面
+                window.location.href = "/admin";
+            } else {
+                showResult('error', data.message);
+            }
+        } catch(err) {
+            showResult('error', `请求异常: ${err.message || '未知错误'}`);
+        } finally {
+            loginBtn.disabled = false;
+        }
+    }
+
+    // 显示结果的辅助函数
+    function showResult(type, message) {
+        result.style.display = 'block';
+        result.classList.remove('result-error');
+        
+        if (type === 'error') {
+            result.classList.add('result-error');
+        }
+        
+        result.innerHTML = `<div class="result-message">${message}</div>`;
+    }
+</script>
+
+</body>
+</html>

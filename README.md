@@ -32,6 +32,8 @@
 
 ### 1. 本地运行
 
+#### 方法 A: 使用 pip（传统方式）
+
 1. 安装依赖
 
     ```sh
@@ -51,6 +53,46 @@
     ```
 
 3. 运行应用
+
+    ```sh
+    python app.py
+    ```
+
+#### 方法 B: 使用 uv（推荐，速度更快）
+
+1. 安装 uv（如果未安装）
+
+    ```sh
+    # 安装 uv
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    ```
+
+2. 创建虚拟环境并安装依赖
+
+    ```sh
+    # 创建虚拟环境
+    uv venv
+    
+    # 激活虚拟环境（可选）
+    source .venv/bin/activate
+    
+    # 安装依赖
+    uv pip install -r requirements.txt
+    ```
+
+3. 设置环境变量
+
+    ```sh
+    export QL_HOST=http://your-qinglong-host:5789
+    export CLIENT_ID=your_client_id
+    export CLIENT_SECRET=your_client_secret
+
+    # 可选配置
+    export MAX_DAILY_ACCESS=7
+    export BACKGROUND_IMAGE_URL=https://t.alcy.cc/ycy
+    ```
+
+4. 运行应用
 
     ```sh
     python app.py

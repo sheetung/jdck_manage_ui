@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员页面 - JD_COOKIE 管理系统</title>
+    <style>
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* 背景遮罩层 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: -1;
+        }
+        
+        /* 容器样式 - 苹果系统风格玻璃透明效果 */
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+        
+        /* 标题样式 */
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 24px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* 顶部栏样式 */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .welcome-message {
+            font-size: 16px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .logout-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* 刷新按钮 */
+        .refresh-btn {
+            padding: 8px 16px;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 1px solid #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .refresh-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        /* 统计信息 */
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            flex: 1;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* 表格样式 */
+        .cookie-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+        }
+        
+        .cookie-table th,
+        .cookie-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .cookie-table th {
+            background: rgba(102, 126, 234, 0.1);
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .cookie-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        /* 状态标签样式 */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .status-inactive {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        /* 加载动画 */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 结果显示样式 */
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+        }
+        
+        .result-error {
+            border-color: rgba(244, 67, 54, 0.5);
+            background: rgba(244, 67, 54, 0.1);
+        }
+        
+        .result-message {
+            font-size: 14px;
+            line-height: 1.6;
+            text-align: center;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px;
+                margin-top: 10px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+            
+            .top-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .stats-container {
+                flex-wrap: wrap;
+            }
+            
+            .stat-item {
+                flex: 1 1 calc(33.333% - 10px);
+                min-width: 100px;
+            }
+            
+            .cookie-table {
+                font-size: 12px;
+            }
+            
+            .cookie-table th,
+            .cookie-table td {
+                padding: 8px 10px;
+            }
+        }
+        
+        /* 版权信息样式 */
+        .copyright {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>JD_COOKIE 管理系统 - 管理员页面</h2>
+    
+    <div class="top-bar">
+        <div class="welcome-message">欢迎，管理员</div>
+        <button class="logout-btn" onclick="logout()">登出</button>
+    </div>
+    
+    <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+        <button class="refresh-btn" onclick="loadCookies()" style="height: 36px;">刷新 COOKIE 列表</button>
+        <input type="email" id="testEmail" placeholder="请输入测试邮箱地址" style="flex: 1; padding: 8px; border: 1px solid #667eea; border-radius: 8px; font-size: 14px; height: 36px;">
+        <button class="refresh-btn" onclick="sendTestEmail()" style="height: 36px;">发送测试邮件</button>
+    </div>
+    
+    <div class="stats-container">
+        <div class="stat-item">
+            <div class="stat-label">总 COOKIE 数</div>
+            <div class="stat-value" id="totalCookies">0</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">已启用</div>
+            <div class="stat-value" id="activeCookies">0</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">已禁用</div>
+            <div class="stat-value" id="inactiveCookies">0</div>
+        </div>
+    </div>
+    
+    <div id="cookieTableContainer" style="overflow-x: auto; margin-top: 20px;">
+        <table class="cookie-table" style="min-width: 800px;">
+            <thead>
+                <tr>
+                    <th style="width: 200px;">pt_pin</th>
+                    <th style="width: 100px;">状态</th>
+                    <th style="width: 150px;">更新时间</th>
+                    <th style="width: 100px;">邮件通知</th>
+                    <th style="flex: 1;">备注</th>
+                </tr>
+            </thead>
+            <tbody id="cookieTableBody">
+                <!-- COOKIE 数据将通过 JavaScript 动态添加 -->
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 40px;">
+                        <div class="loading-spinner"></div> 正在加载 COOKIE 数据...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div id="result" class="result-container"></div>
+    
+    <!-- 版权信息 -->
+    <div class="copyright">
+        &copy; 2025 sheetung. All rights reserved.
+    </div>
+</div>
+
+<script>
+    // 页面加载时设置背景图
+    async function loadConfig() {
+        try {
+            const res = await fetch("/api/config");
+            const data = await res.json();
+            if (data.code === 200 && data.data.backgroundImageUrl) {
+                document.body.style.backgroundImage = `url('${data.data.backgroundImageUrl}')`;
+            }
+        } catch (err) {
+            console.error('加载配置失败:', err);
+            // 使用默认背景图
+            document.body.style.backgroundImage = "url('https://t.alcy.cc/ycy')";
+        }
+    }
+
+    // 立即执行配置加载
+    loadConfig();
+
+    // 页面加载时检查登录状态并加载 COOKIE 数据
+    window.onload = async function() {
+        await checkLoginStatus();
+        await loadCookies();
+    };
+
+    // 检查登录状态
+    async function checkLoginStatus() {
+        try {
+            const res = await fetch("/api/admin/check");
+            const data = await res.json();
+            
+            if (data.code !== 200) {
+                // 未登录，跳转到登录页面
+                window.location.href = "/admin/login";
+            }
+        } catch (err) {
+            console.error('检查登录状态失败:', err);
+            window.location.href = "/admin/login";
+        }
+    }
+
+    // 加载 COOKIE 数据
+    async function loadCookies() {
+        try {
+            const res = await fetch("/api/admin/cookies");
+            const data = await res.json();
+            
+            if (data.code === 200) {
+                await renderCookies(data.data);
+                updateStats(data.data);
+            } else {
+                showResult('error', data.message);
+            }
+        } catch (err) {
+            console.error('加载 COOKIE 数据失败:', err);
+            showResult('error', `加载失败: ${err.message || '未知错误'}`);
+        }
+    }
+
+    // 渲染 COOKIE 数据到表格
+    async function renderCookies(cookies) {
+        const tableBody = document.getElementById("cookieTableBody");
+        tableBody.innerHTML = '';
+        
+        if (cookies.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 40px;">
+                        暂无 COOKIE 数据
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        // 获取用户配置
+        let userConfig = {};
+        try {
+            const res = await fetch("/api/admin/user-config");
+            const data = await res.json();
+            if (data.code === 200) {
+                userConfig = data.data;
+            }
+        } catch (err) {
+            console.error('获取用户配置失败:', err);
+        }
+        
+        cookies.forEach(cookie => {
+            const row = document.createElement('tr');
+            
+            // 从 value 中提取 pt_pin
+            let ptPin = '未知';
+            const match = cookie.value.match(/pt_pin=([^;]+);?/);
+            if (match) {
+                ptPin = match[1];
+            }
+            
+            // 状态标签
+            let statusBadge = cookie.status === 0 
+                ? '<span class="status-badge status-active">已启用</span>' 
+                : '<span class="status-badge status-inactive">已禁用</span>';
+            
+            // 邮件通知状态
+            let emailNotificationBadge = '<span class="status-badge status-inactive">未开启</span>';
+            if (userConfig[ptPin] && userConfig[ptPin].emailNotification) {
+                emailNotificationBadge = '<span class="status-badge status-active">已开启</span>';
+            }
+            
+            // 格式化更新时间
+            const updatedAt = cookie.updatedAt ? new Date(cookie.updatedAt).toLocaleString('zh-CN') : '未知';
+            
+            row.innerHTML = `
+                <td>${ptPin}</td>
+                <td>${statusBadge}</td>
+                <td>${updatedAt}</td>
+                <td>${emailNotificationBadge}</td>
+                <td>${cookie.remarks || '无'}</td>
+            `;
+            
+            tableBody.appendChild(row);
+        });
+    }
+
+    // 更新统计信息
+    function updateStats(cookies) {
+        document.getElementById("totalCookies").textContent = cookies.length;
+        document.getElementById("activeCookies").textContent = cookies.filter(c => c.status === 0).length;
+        document.getElementById("inactiveCookies").textContent = cookies.filter(c => c.status === 1).length;
+    }
+
+    // 登出功能
+    async function logout() {
+        try {
+            const res = await fetch("/api/admin/logout", {
+                method: "POST"
+            });
+            
+            const data = await res.json();
+            
+            if (data.code === 200) {
+                window.location.href = "/admin/login";
+            }
+        } catch (err) {
+            console.error('登出失败:', err);
+        }
+    }
+
+    // 显示结果的辅助函数
+    function showResult(type, message) {
+        const result = document.getElementById("result");
+        result.style.display = 'block';
+        result.classList.remove('result-error');
+        
+        if (type === 'error') {
+            result.classList.add('result-error');
+        }
+        
+        result.innerHTML = `<div class="result-message">${message}</div>`;
+        
+        // 3秒后自动隐藏
+        setTimeout(() => {
+            result.style.display = 'none';
+        }, 3000);
+    }
+    
+    // 发送测试邮件
+    async function sendTestEmail() {
+        try {
+            const testEmail = document.getElementById('testEmail').value.trim();
+            
+            const res = await fetch("/api/admin/email/test", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: testEmail })
+            });
+            
+            const data = await res.json();
+            
+            if (data.code === 200) {
+                showResult('success', '测试邮件发送成功');
+            } else {
+                showResult('error', data.message);
+            }
+        } catch (err) {
+            console.error('发送测试邮件失败:', err);
+            showResult('error', `发送失败: ${err.message || '未知错误'}`);
+        }
+    }
+</script>
+
+</body>
+</html>

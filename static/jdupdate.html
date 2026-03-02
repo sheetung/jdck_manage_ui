@@ -525,23 +525,11 @@
     <h2>JD_COOKIE 管理系统</h2>
 
     <div class="tab">
-        <button class="tab-btn active" onclick="openTab(event, 'updateTab')">更新</button>
-        <button class="tab-btn" onclick="openTab(event, 'queryTab')">查询</button>
+        <button class="tab-btn active" onclick="openTab(event, 'queryTab')">查询</button>
+        <button class="tab-btn" onclick="openTab(event, 'updateTab')">更新</button>
     </div>
 
-    <div id="updateTab" class="tab-content active">
-        <h3>JD_COOKIE 更新</h3>
-        
-        <div class="form-group">
-            <label for="value">完整 JD_COOKIE 值 (包含pt_key和pt_pin):</label>
-            <textarea id="value" rows="4" placeholder="请输入完整的 JD_COOKIE 值，例如: pt_key=xxx;pt_pin=yyy;"></textarea>
-        </div>
-
-        <button id="updateBtn" onclick="updateCookie()">更新并启用</button>
-        <div id="result" class="result-container"></div>
-    </div>
-
-    <div id="queryTab" class="tab-content">
+    <div id="queryTab" class="tab-content active">
         <h3>JD_COOKIE 查询</h3>
         
         <div class="form-group">
@@ -551,6 +539,18 @@
 
         <button id="queryBtn" onclick="queryCookie()">查询</button>
         <div id="queryResult"></div>
+    </div>
+
+    <div id="updateTab" class="tab-content">
+        <h3>JD_COOKIE 更新</h3>
+        
+        <div class="form-group">
+            <label for="value">完整 JD_COOKIE 值 (包含pt_key和pt_pin):</label>
+            <textarea id="value" rows="4" placeholder="请输入完整的 JD_COOKIE 值，例如: pt_key=xxx;pt_pin=yyy;"></textarea>
+        </div>
+
+        <button id="updateBtn" onclick="updateCookie()">更新并启用</button>
+        <div id="result" class="result-container"></div>
     </div>
 
     <!-- 使用帮助按钮 -->
@@ -742,6 +742,19 @@
                             <span class="query-value">${formatDate(envInfo.updatedAt) || '未知'}</span>
                         </div>
                     </div>
+                    
+                    <div class="query-result-container" style="margin-top: 20px;">
+                        <div class="query-result-header">邮箱通知设置</div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label for="email">邮箱地址:</label>
+                            <input type="email" id="email" placeholder="请输入您的邮箱地址">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <input type="checkbox" id="emailNotification" style="margin-right: 10px;">
+                            <label for="emailNotification">开启邮件通知</label>
+                        </div>
+                        <button onclick="bindEmail('${ptpin}')" style="width: 100%; padding: 10px; margin-top: 10px;">绑定邮箱</button>
+                    </div>
                 `;
             } else {
                 queryResult.innerHTML = `
@@ -833,6 +846,52 @@
     window.onclick = function(event) {
         if (event.target === helpModal) {
             helpModal.style.display = "none";
+        }
+    }
+    
+    // 绑定邮箱功能
+    async function bindEmail(ptpin) {
+        const email = document.getElementById('email').value.trim();
+        const emailNotification = document.getElementById('emailNotification').checked;
+        
+        // 输入验证
+        if (!email) {
+            queryResult.innerHTML += `
+                <div class="result-container result-error">
+                    <div class="result-message">邮箱地址不能为空</div>
+                </div>
+            `;
+            return;
+        }
+        
+        try {
+            const res = await fetch("/api/jdcookie/bind-email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ptpin, email, emailNotification })
+            });
+            
+            const data = await res.json();
+            
+            if (data.code === 200) {
+                queryResult.innerHTML += `
+                    <div class="result-container result-success">
+                        <div class="result-message">${data.message}</div>
+                    </div>
+                `;
+            } else {
+                queryResult.innerHTML += `
+                    <div class="result-container result-error">
+                        <div class="result-message">${data.message}</div>
+                    </div>
+                `;
+            }
+        } catch(err) {
+            queryResult.innerHTML += `
+                <div class="result-container result-error">
+                    <div class="result-message">请求异常: ${err.message || '未知错误'}</div>
+                </div>
+            `;
         }
     }
 </script>
