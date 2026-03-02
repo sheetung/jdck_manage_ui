@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  jdupdate:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - QL_HOST=${QL_HOST}
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+      - MAX_DAILY_ACCESS=${MAX_DAILY_ACCESS:-7}
+      - BACKGROUND_IMAGE_URL=${BACKGROUND_IMAGE_URL:-https://t.alcy.cc/ycy}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - EMAIL_ENABLED=${EMAIL_ENABLED:-true}
+      - SMTP_SERVER=${SMTP_SERVER}
+      - SMTP_PORT=${SMTP_PORT:-465}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - EMAIL_CHECK_TIME=${EMAIL_CHECK_TIME:-08:00}
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - ./user_config.yaml:/app/user_config.yaml
+    restart: always

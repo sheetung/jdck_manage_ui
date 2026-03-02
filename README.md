@@ -1,10 +1,12 @@
 # JD_COOKIE 管理系统
 
-本项目是一个基于 Flask 的 JD_COOKIE 管理系统，支持 JD_COOKIE 的查询与更新，适合内部使用。前端页面美观，支持 Docker 部署。
+本项目是一个基于 Flask 的 青龙面板的JD_COOKIE 管理系统，支持 JD_COOKIE 的查询与更新，适合内部使用。前端页面美观，支持 Docker 部署。
 
 ![](figs/1.png)
 
 ![](figs/2.png)
+
+![](figs/3.png)
 
 ## 功能简介
 
@@ -72,6 +74,8 @@ uv run app.py
 
 访问 http://localhost:8080 即可使用。
 
+访问 http://localhost:8080/admin/login 登录管理员界面查看相关统计
+
 ---
 
 ### 方式二：Docker Compose 部署（推荐）
@@ -99,7 +103,9 @@ docker compose up -d
 docker compose logs -f
 ```
 
-访问 http://your-server-ip:8088 即可使用。
+访问 http://your-server-ip:8080 即可使用。
+
+访问 http://localhost:8080/admin/login 登录管理员界面查看相关统计
 
 ---
 
