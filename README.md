@@ -11,163 +11,121 @@
 - 查询 JD_COOKIE 状态（按 pt_pin 查询）
 - 更新并启用 JD_COOKIE
 - 限制同一 IP 每日访问次数
+- **邮件提醒系统**：Cookie 过期时自动发送邮件通知
+- **管理后台**：查看所有 Cookie 状态、配置邮件系统、管理用户绑定邮箱
 - 支持 Docker 一键部署
 
 ## 目录结构
 
 ```
 .
-├── app.py                  # Flask 主程序
-├── requirements.txt        # Python 依赖
-├── Dockerfile              # Docker 镜像构建文件
-├── docker-compose.yml.example # Compose 示例配置
+├── app.py                        # Flask 主程序
+├── requirements.txt              # Python 依赖
+├── Dockerfile                    # Docker 镜像构建文件
+├── config.yaml.example           # 配置文件模板（cp 后填写）
+├── docker-compose.yaml.example   # Compose 示例配置
+├── user_config.yaml.example      # 用户配置模板（cp 后填写）
 ├── static/
-│   ├── index.html
-│   └── jdupdate.html       # 前端页面
+│   ├── jdupdate.html             # 主前端页面
+│   ├── admin.html                # 管理后台页面
+│   └── admin_login.html          # 管理后台登录页
 ├── .dockerignore
 └── .gitignore
 ```
 
 ## 快速开始
 
-### 1. 本地运行
+### 1. 复制配置文件
+
+```sh
+cp config.yaml.example config.yaml
+cp user_config.yaml.example user_config.yaml
+```
+
+编辑 `config.yaml`，填入青龙面板信息、管理员账号、邮件配置等。
+
+### 2. 本地运行
 
 #### 方法 A: 使用 pip（传统方式）
 
-1. 安装依赖
-
-    ```sh
-    pip install -r requirements.txt
-    ```
-
-2. 设置环境变量
-
-    ```sh
-    export QL_HOST=http://your-qinglong-host:5789
-    export CLIENT_ID=your_client_id
-    export CLIENT_SECRET=your_client_secret
-
-    # 可选配置
-    export MAX_DAILY_ACCESS=7
-    export BACKGROUND_IMAGE_URL=https://t.alcy.cc/ycy
-    ```
-
-3. 运行应用
-
-    ```sh
-    python app.py
-    ```
+```sh
+pip install -r requirements.txt
+python app.py
+```
 
 #### 方法 B: 使用 uv（推荐，速度更快）
 
-1. 安装 uv（如果未安装）
+```sh
+# 安装 uv（如果未安装）
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-    ```sh
-    # 安装 uv
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    ```
+# 创建虚拟环境并安装依赖
+uv venv
+source .venv/bin/activate
+uv pip install -r requirements.txt
 
-2. 创建虚拟环境并安装依赖
+# 运行
+uv run app.py
+```
 
-    ```sh
-    # 创建虚拟环境
-    uv venv
-    
-    # 激活虚拟环境（可选）
-    source .venv/bin/activate
-    
-    # 安装依赖
-    uv pip install -r requirements.txt
-    ```
+### 3. Docker Compose 部署（推荐）
 
-3. 设置环境变量
+```sh
+cp docker-compose.yaml.example docker-compose.yaml
+# 编辑 docker-compose.yaml，填入配置
 
-    ```sh
-    export QL_HOST=http://your-qinglong-host:5789
-    export CLIENT_ID=your_client_id
-    export CLIENT_SECRET=your_client_secret
+docker build -t jdupdate .
+docker compose up -d
 
-    # 可选配置
-    export MAX_DAILY_ACCESS=7
-    export BACKGROUND_IMAGE_URL=https://t.alcy.cc/ycy
-    ```
+# 查看日志
+docker compose logs -f
+```
 
-4. 运行应用
+## 配置说明
 
-    ```sh
-    python app.py
-    ```
+所有配置通过 `config.yaml` 管理（参考 `config.yaml.example`）：
 
-### 2. Docker Compose 部署（推荐）
+### 青龙面板（必填）
+- `QL_HOST`：青龙面板地址（如 `http://192.168.1.1:5789`）
+- `CLIENT_ID`：青龙开放 API Client ID
+- `CLIENT_SECRET`：青龙开放 API Client Secret
 
-1. 复制并修改配置文件
+### 管理员账号
+- `ADMIN_USERNAME`：管理员用户名（默认 `admin`）
+- `ADMIN_PASSWORD`：管理员密码（默认 `admin123`，**请修改！**）
+- `ADMIN_EMAIL`：管理员邮箱（用于接收测试邮件）
 
-    ```sh
-    cp docker-compose.yaml.example docker-compose.yaml
-    ```
+### 可选配置
+- `MAX_DAILY_ACCESS`：每个 IP 每日最大访问次数（默认 `7`）
+- `BACKGROUND_IMAGE_URL`：页面背景图 URL（默认随机图片 API）
 
-2. 编辑 `docker-compose.yaml`，填入你的青龙面板配置信息
+### 邮件系统
+- `email.enabled`：是否启用邮件提醒（`true`/`false`）
+- `email.smtpServer`：SMTP 服务器地址
+- `email.smtpPort`：SMTP 端口（465 使用 SSL，587 使用 STARTTLS）
+- `email.smtpUser`：发件邮箱账号
+- `email.smtpPass`：邮箱授权码
+- `email.checkTime`：每日检查时间（如 `08:00`）
 
+## API 接口
 
-3. 构建镜像
-
-    ```sh
-    docker build -t jdupdate .
-    ```
-
-4. 启动服务
-
-    ```sh
-    docker-compose up -d
-    ```
-
-4. 查看日志
-
-    ```sh
-    docker-compose logs -f
-    ```
-
-## 环境变量说明
-
-### 必需环境变量
-- `QL_HOST`：青龙面板地址（如 `http://192.168.192.37:5789`）
-- `CLIENT_ID`：青龙开放 API 的 Client ID
-- `CLIENT_SECRET`：青龙开放 API 的 Client Secret
-
-### 可选环境变量
-- `MAX_DAILY_ACCESS`：每个 IP 每日最大访问次数（默认值：`7`）
-- `BACKGROUND_IMAGE_URL`：页面背景图片 URL（默认值：`https://t.alcy.cc/ycy`）
-  - 可以使用任何图片 URL
-  - 推荐使用随机图片 API 或自定义图片链接
-
-## 前端页面
-
-访问 `http://localhost:8080` 即可使用管理界面，支持 JD_COOKIE 查询与更新。
-
-## 功能特性
-
-### IP 访问限制
-- 默认每个 IP 每日最多可访问 7 次（可通过 `MAX_DAILY_ACCESS` 环境变量修改）
-- 访问计数自动在每日重置
-- 超过限制后会显示剩余重置时间
-
-### 自定义背景
-- 支持通过 `BACKGROUND_IMAGE_URL` 环境变量自定义页面背景图
-- 默认使用随机图片 API
-- 可以使用任何公开的图片 URL
-
-### API 接口
-- `GET /api/config` - 获取前端配置信息
-- `GET /api/envs` - 获取青龙面板环境变量列表
-- `GET /api/jdcookie/query?ptpin=<value>` - 查询指定 pt_pin 的 JD_COOKIE
-- `POST /api/jdcookie/update` - 更新并启用 JD_COOKIE
+- `GET /` - 主页面
+- `GET /admin` - 管理后台
+- `GET /api/config` - 获取前端配置
+- `GET /api/envs` - 获取青龙环境变量列表
+- `GET /api/jdcookie/query?ptpin=<value>` - 查询 JD_COOKIE（有频率限制）
+- `POST /api/jdcookie/update` - 更新并启用 JD_COOKIE（有频率限制）
+- `POST /api/jdcookie/bind-email` - 绑定邮箱提醒（有频率限制）
+- `GET /api/admin/email/config` - 获取邮件配置（需登录）
+- `POST /api/admin/email/config` - 保存邮件配置（需登录）
+- `POST /api/admin/email/test` - 发送测试邮件（需登录）
 
 ## 注意事项
 
 - 本项目仅供内部学习与交流使用，请勿用于非法用途
 - IP 访问限制基于内存存储，应用重启后计数会重置
-- 默认限制同一 IP 每日最多 7 次操作，可通过环境变量修改
-- 建议在生产环境中使用 HTTPS 协议确保数据传输安全
+- 生产环境建议修改默认管理员密码，并使用 HTTPS
+- `config.yaml` 和 `user_config.yaml` 包含敏感信息，已加入 `.gitignore`
 
 ## 问题反馈及功能开发
 

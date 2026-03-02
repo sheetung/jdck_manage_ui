@@ -4,7 +4,7 @@ import yaml
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from flask import Flask, request, jsonify, render_template, session
+from flask import Flask, request, jsonify, render_template, session, redirect
 import requests, time, re
 import datetime
 import threading
@@ -219,10 +219,24 @@ def get_ql_token():
 
 # 加载邮件配置
 def load_email_config():
-    # 从config.yaml中获取邮件配置
-    email_config = CONFIG.get('email', {})
-    if email_config:
+    # 优先从环境变量中获取邮件配置
+    email_config = {
+        'enabled': os.environ.get('EMAIL_ENABLED', 'false').lower() == 'true',
+        'smtpServer': os.environ.get('SMTP_SERVER', ''),
+        'smtpPort': int(os.environ.get('SMTP_PORT', '587')),
+        'smtpUser': os.environ.get('SMTP_USER', ''),
+        'smtpPass': os.environ.get('SMTP_PASS', ''),
+        'checkTime': os.environ.get('EMAIL_CHECK_TIME', '08:00')
+    }
+    
+    # 检查环境变量是否配置完整
+    if all([email_config['smtpServer'], email_config['smtpUser'], email_config['smtpPass']]):
         return email_config
+    
+    # 从config.yaml中获取邮件配置
+    yaml_config = CONFIG.get('email', {})
+    if yaml_config:
+        return yaml_config
     
     # 默认配置
     return {
@@ -341,7 +355,7 @@ def check_cookies_expiry():
                     # 发送邮件提醒
                     subject = "JD_COOKIE 到期提醒"
                     update_url = CONFIG.get('server', {}).get('updateUrl', 'http://localhost:8082')
-                    body = f"尊敬的用户，您的 JD_COOKIE (pt_pin: {pt_pin}) 已超过7天未更新，可能已过期，请及时更新。\n\n"
+                    body = f"尊敬的用户，您的 JD_COOKIE (pt_pin: {pt_pin}) 已超过3天未更新，可能已过期，请及时更新。\n\n"
                     body += f"更新链接: {update_url}\n\n"
                     body += "如需关闭提醒，请登录系统后在邮箱通知设置中关闭邮件通知。"
                     send_email(email, subject, body)
@@ -422,7 +436,7 @@ def query_jdcookie():
         # 获取所有 JD_COOKIE
         res = requests.get(f"{QL_HOST}/open/envs?searchValue=JD_COOKIE", headers=headers, verify=False, timeout=10)
         envs_data = res.json()
-        if envs_data.get("code") is not 200:
+        if envs_data.get("code") != 200:
             return jsonify({"code": 500, "message": "获取环境变量失败"})
 
         envs = envs_data.get("data", [])
@@ -474,7 +488,7 @@ def update_jdcookie():
         # 获取所有 JD_COOKIE
         res = requests.get(f"{QL_HOST}/open/envs?searchValue=JD_COOKIE", headers=headers, verify=False, timeout=10)
         envs_data = res.json()
-        if envs_data.get("code") is not 200:
+        if envs_data.get("code") != 200:
             return jsonify({"code": 500, "message": "获取环境变量失败"})
 
         envs = envs_data.get("data", [])
@@ -502,7 +516,7 @@ def update_jdcookie():
         }
         res_update = requests.put(f"{QL_HOST}/open/envs", headers=headers, json=payload, verify=False, timeout=10)
         update_result = res_update.json()
-        if update_result.get("code") is not 200:
+        if update_result.get("code") != 200:
             return jsonify({"code": 500, "message": f"更新环境变量失败: {update_result}"})
 
         # 启用环境变量
@@ -548,7 +562,7 @@ def bind_email():
         # 获取所有 JD_COOKIE
         res = requests.get(f"{QL_HOST}/open/envs?searchValue=JD_COOKIE", headers=headers, verify=False, timeout=10)
         envs_data = res.json()
-        if envs_data.get("code") is not 200:
+        if envs_data.get("code") != 200:
             return jsonify({"code": 500, "message": "获取环境变量失败"})
         
         envs = envs_data.get("data", [])
@@ -606,7 +620,7 @@ def admin_login():
 def admin_page():
     # 检查登录状态
     if not session.get('admin_logged_in'):
-        return flask.redirect("/admin/login")
+        return redirect("/admin/login")
     return render_template("admin.html")
 
 @app.route("/api/admin/login", methods=["POST"])
