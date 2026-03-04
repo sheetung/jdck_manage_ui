@@ -2,580 +2,729 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JD_COOKIE 管理系统-仅供内部使用</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JD_COOKIE 管理系统</title>
     <style>
-        /* 全局样式 */
+        /* ============ CSS 变量 ============ */
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a6fd6;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            
+            --bg-glass: rgba(255, 255, 255, 0.75);
+            --bg-glass-hover: rgba(255, 255, 255, 0.85);
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --bg-overlay: rgba(0, 0, 0, 0.4);
+            
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            
+            --border-light: rgba(255, 255, 255, 0.6);
+            --border-focus: var(--primary);
+            
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-xl: 24px;
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ============ 全局重置 ============ */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
+        html {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+        }
+
         body {
-            font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            /* 使用图片背景替代渐变 - 背景图将通过JavaScript动态设置 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
-            padding: 20px;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
-            /* 添加背景遮罩，增强文字可读性 */
+            padding: 16px;
             position: relative;
+            color: var(--text-primary);
+            line-height: 1.5;
         }
-        
-        /* 背景遮罩层 */
+
+        /* 背景遮罩 */
         body::before {
             content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.3);
+            position: fixed;
+            inset: 0;
+            background: var(--bg-overlay);
             z-index: -1;
         }
-        
-        /* 容器样式 - 苹果系统风格玻璃透明效果 */
+
+        /* ============ 主容器 ============ */
         .container {
-            max-width: 600px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.6);
+            max-width: 480px;
+            background: var(--bg-glass);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            padding: 30px;
-            border-radius: 18px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-xl);
+            padding: 24px;
+            animation: slideUp 0.4s ease-out;
         }
-        
-        .container:hover {
-            transform: translateY(-3px);
-            background: rgba(255, 255, 255, 0.7);
-            box-shadow: 0 12px 40px rgba(31, 38, 135, 0.2);
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
-        /* 标题样式 */
-        h2 {
+
+        /* ============ 标题 ============ */
+        .header {
             text-align: center;
-            margin-bottom: 30px;
-            color: #333;
-            font-size: 28px;
-            font-weight: 600;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            margin-bottom: 4px;
         }
-        
+
+        .subtitle {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
         h3 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            color: #555;
-            font-size: 20px;
-            font-weight: 500;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 10px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
         }
-        
-        /* 标签页样式 */
-        .tab {
+
+        /* ============ Tab 切换 ============ */
+        .tab-nav {
             display: flex;
-            margin-bottom: 30px;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            gap: 4px;
+            background: rgba(102, 126, 234, 0.08);
+            border-radius: var(--radius-md);
+            padding: 4px;
+            margin-bottom: 24px;
         }
-        
+
         .tab-btn {
             flex: 1;
-            padding: 15px 10px;
+            padding: 12px 16px;
             text-align: center;
             cursor: pointer;
             border: none;
-            background: none;
-            font-size: 16px;
+            background: transparent;
+            font-size: 0.9375rem;
             font-weight: 500;
-            color: #666;
-            transition: all 0.3s ease;
+            color: var(--text-secondary);
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
             position: relative;
+            width: 100%;
         }
-        
+
         .tab-btn:hover {
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--primary);
         }
-        
+
         .tab-btn.active {
-            color: #667eea;
-            font-weight: 600;
+            background: white;
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
         }
-        
-        .tab-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 3px;
-            background: #667eea;
-            border-radius: 3px;
-        }
-        
+
+        /* Tab 内容 */
         .tab-content {
             display: none;
-            animation: fadeIn 0.5s ease;
         }
-        
+
         .tab-content.active {
             display: block;
+            animation: fadeIn 0.3s ease;
         }
-        
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
-        /* 表单样式 */
+
+        /* ============ 表单 ============ */
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
-        
+
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #555;
-            font-size: 14px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
         }
-        
-        input, textarea {
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        textarea {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            background-color: #fafafa;
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-family: inherit;
+            background: white;
+            transition: var(--transition);
         }
-        
-        input:focus, textarea:focus {
+
+        input:focus,
+        textarea:focus {
             outline: none;
-            border-color: #667eea;
-            background-color: white;
-            box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.1);
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
-        
+
+        input::placeholder,
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+
         textarea {
             resize: vertical;
             min-height: 100px;
+            line-height: 1.5;
         }
-        
-        /* 按钮样式 */
-        button {
-            width: 100%;
-            padding: 14px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
+
+        /* Checkbox 样式 */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
             cursor: pointer;
-            font-size: 16px;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        /* ============ 按钮 ============ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 24px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
             font-weight: 600;
-            transition: all 0.3s ease;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
             position: relative;
             overflow: hidden;
         }
-        
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: all 0.5s ease;
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
         }
-        
-        button:hover::before {
-            left: 100%;
-        }
-        
-        button:hover {
+
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
         }
-        
-        button:active {
+
+        .btn-primary:active:not(:disabled) {
             transform: translateY(0);
         }
-        
-        button:disabled {
-            opacity: 0.7;
+
+        .btn-primary:disabled {
+            opacity: 0.6;
             cursor: not-allowed;
             transform: none;
-            box-shadow: none;
-        }
-        
-        /* 结果显示样式 - 苹果系统风格玻璃透明效果 */
-        .result-container {
-            margin-top: 25px;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            background: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-        }
-        
-        .result-success {
-            border-color: rgba(76, 175, 80, 0.5);
-            background: rgba(76, 175, 80, 0.1);
-        }
-        
-        .result-error {
-            border-color: rgba(244, 67, 54, 0.5);
-            background: rgba(244, 67, 54, 0.1);
-        }
-        
-        .result-info {
-            border-color: rgba(33, 150, 243, 0.5);
-            background: rgba(33, 150, 243, 0.1);
-        }
-        
-        .result-message {
-            font-size: 14px;
-            line-height: 1.6;
-            text-align: center;
-        }
-        
-        /* 查询结果样式 - 苹果系统风格玻璃透明效果 */
-        .query-result-container {
-            margin-top: 25px;
-            padding: 20px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-        }
-        
-        .query-result-header {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 18px;
-            font-weight: 600;
-            color: #555;
-        }
-        
-        .query-item {
-            margin-bottom: 15px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-        }
-        
-        .query-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            background: rgba(255, 255, 255, 0.9);
-        }
-        
-        .query-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        .query-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: #667eea;
-            margin-bottom: 4px;
-        }
-        
-        .query-value {
-            font-size: 14px;
-            color: #333;
-            word-break: break-all;
-        }
-        
-        /* 状态标签样式 */
-        .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .status-active {
-            background-color: #4caf50;
-            color: white;
-        }
-        
-        .status-inactive {
-            background-color: #f44336;
-            color: white;
-        }
-        
-        /* 加载动画 */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(102, 126, 234, 0.3);
-            border-radius: 50%;
-            border-top-color: #667eea;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-                align-items: flex-start;
-            }
-
-            .container {
-                margin: 20px 0;
-                padding: 20px;
-            }
-
-            h2 {
-                font-size: 24px;
-            }
-
-            h3 {
-                font-size: 18px;
-            }
-
-            .tab-btn {
-                font-size: 14px;
-                padding: 12px 8px;
-            }
-
-            button {
-                padding: 12px 16px;
-                font-size: 14px;
-            }
         }
 
-        /* 版权信息样式 */
-        .copyright {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 14px;
-            font-weight: 500;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        @media (max-width: 768px) {
-            .copyright {
-                font-size: 12px;
-                margin-top: 20px;
-                padding-top: 15px;
-            }
-        }
-        
-        /* 使用帮助按钮样式 */
-        .help-btn {
-            position: relative;
+        .btn-secondary {
             background: rgba(255, 255, 255, 0.2);
+            color: white;
             border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 12px 24px;
-            color: #ffffff;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 20px auto 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            min-width: 120px;
+            backdrop-filter: blur(10px);
         }
-        
-        .help-btn:hover {
+
+        .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
         }
-        
+
+        .btn-sm {
+            padding: 10px 16px;
+            font-size: 0.875rem;
+        }
+
+        /* ============ 结果显示 ============ */
+        .result {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            font-size: 0.9375rem;
+            text-align: center;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #047857;
+        }
+
+        .result-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #dc2626;
+        }
+
+        .result-info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #2563eb;
+        }
+
+        /* ============ 查询结果卡片 ============ */
+        .query-result {
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .result-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .info-row {
+            display: flex;
+            flex-direction: column;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 0.9375rem;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+
+        /* 状态标签 */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.15);
+            color: #059669;
+        }
+
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.15);
+            color: #dc2626;
+        }
+
+        /* ============ 加载动画 ============ */
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ============ 帮助按钮 ============ */
+        .help-btn {
+            margin-top: 24px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: white;
+            font-weight: 500;
+        }
+
         .help-btn::before {
             content: "💡";
-            margin-right: 8px;
-            font-size: 18px;
+            font-size: 1.125rem;
         }
-        
-        /* 模态框样式 */
+
+        /* ============ 模态框 ============ */
         .modal {
             display: none;
             position: fixed;
+            inset: 0;
             z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             overflow: auto;
-            transition: opacity 0.3s ease;
+            animation: fadeIn 0.2s ease;
         }
-        
-        .modal-content {
-            position: relative;
-            background: rgba(24, 24, 24, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            margin: 5% auto;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            max-width: 90%;
-            max-height: 90vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            animation: modalFadeIn 0.5s ease;
-        }
-        
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            color: #e0e0e0;
-            font-size: 30px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-        
-        .close:hover,
-        .close:focus {
-            color: #fff;
-        }
-        
-        .help-image-container {
-            max-width: 100%;
-            max-height: 70vh;
-            overflow: auto;
-            overflow: hidden;
+
+        .modal.show {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px 0;
+            padding: 16px;
         }
-        
+
+        .modal-content {
+            position: relative;
+            background: #1f2937;
+            border-radius: var(--radius-lg);
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: hidden;
+            animation: scaleIn 0.3s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #f3f4f6;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+            width: auto;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: white;
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow: auto;
+            max-height: calc(90vh - 60px);
+        }
+
         .help-image {
             max-width: 100%;
-            max-height: 70vh;
-            width: auto;
             height: auto;
-            border-radius: 8px;
-            object-fit: contain;
-            display: block;
+            border-radius: var(--radius-sm);
         }
-        
-        .modal-title {
-            color: #e0e0e0;
-            margin-bottom: 20px;
-            font-size: 20px;
-            font-weight: 600;
+
+        /* ============ 版权信息 ============ */
+        .copyright {
+            text-align: center;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .copyright a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+        }
+
+        .copyright a:hover {
+            text-decoration: underline;
+        }
+
+        /* ============ 邮箱绑定表单 ============ */
+        .email-form {
+            margin-top: 16px;
+        }
+
+        .email-form .form-group {
+            margin-bottom: 12px;
+        }
+
+        /* ============ 响应式设计 ============ */
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+                align-items: flex-start;
+                padding-top: max(12px, env(safe-area-inset-top));
+                padding-bottom: max(12px, env(safe-area-inset-bottom));
+            }
+
+            .container {
+                padding: 20px;
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1rem;
+            }
+
+            .tab-btn {
+                padding: 10px 12px;
+                font-size: 0.875rem;
+            }
+
+            .btn {
+                padding: 12px 20px;
+            }
+
+            input[type="text"],
+            input[type="email"],
+            input[type="password"],
+            textarea {
+                padding: 12px 14px;
+                font-size: 16px; /* 防止iOS缩放 */
+            }
+
+            .result-card {
+                padding: 16px;
+            }
+
+            .modal-content {
+                max-width: 95vw;
+            }
+
+            .modal-body {
+                padding: 16px;
+            }
+        }
+
+        /* 横屏手机优化 */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                padding: 8px;
+            }
+
+            .container {
+                margin: 8px 0;
+                padding: 16px;
+            }
+
+            .header {
+                margin-bottom: 16px;
+            }
+
+            h2 {
+                font-size: 1.25rem;
+                margin-bottom: 0;
+            }
+
+            .subtitle {
+                display: none;
+            }
+        }
+
+        /* ============ 工具类 ============ */
+        .mt-2 {
+            margin-top: 8px;
+        }
+
+        .mt-3 {
+            margin-top: 12px;
+        }
+
+        .mt-4 {
+            margin-top: 16px;
+        }
+
+        .text-center {
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>JD_COOKIE 管理系统</h2>
-
-    <div class="tab">
-        <button class="tab-btn active" onclick="openTab(event, 'queryTab')">查询</button>
-        <button class="tab-btn" onclick="openTab(event, 'updateTab')">更新</button>
+    <div class="header">
+        <h2>JD_COOKIE 管理</h2>
+        <p class="subtitle">京东 Cookie 管理系统</p>
     </div>
 
-    <div id="queryTab" class="tab-content active">
-        <h3>JD_COOKIE 查询</h3>
+    <!-- Tab 导航 -->
+    <div class="tab-nav" role="tablist">
+        <button class="tab-btn active" onclick="openTab(event, 'queryTab')" role="tab" aria-selected="true">查询</button>
+        <button class="tab-btn" onclick="openTab(event, 'updateTab')" role="tab" aria-selected="false">更新</button>
+    </div>
+
+    <!-- 查询 Tab -->
+    <div id="queryTab" class="tab-content active" role="tabpanel">
+        <h3>查询 Cookie</h3>
         
         <div class="form-group">
-            <label for="ptpin">pt_pin 值:</label>
-            <input type="text" id="ptpin" placeholder="请输入 pt_pin 值，例如: 京东用户名123">
+            <label for="ptpin">pt_pin 值</label>
+            <input type="text" id="ptpin" placeholder="请输入 pt_pin 值">
         </div>
 
-        <button id="queryBtn" onclick="queryCookie()">查询</button>
-        <div id="queryResult"></div>
+        <button class="btn btn-primary" id="queryBtn" onclick="queryCookie()">查询</button>
+        
+        <div id="queryResult" class="query-result"></div>
     </div>
 
-    <div id="updateTab" class="tab-content">
-        <h3>JD_COOKIE 更新</h3>
+    <!-- 更新 Tab -->
+    <div id="updateTab" class="tab-content" role="tabpanel">
+        <h3>更新 Cookie</h3>
         
         <div class="form-group">
-            <label for="value">完整 JD_COOKIE 值 (包含pt_key和pt_pin):</label>
+            <label for="value">完整 JD_COOKIE 值</label>
             <textarea id="value" rows="4" placeholder="请输入完整的 JD_COOKIE 值，例如: pt_key=xxx;pt_pin=yyy;"></textarea>
         </div>
 
-        <button id="updateBtn" onclick="updateCookie()">更新并启用</button>
-        <div id="result" class="result-container"></div>
+        <button class="btn btn-primary" id="updateBtn" onclick="updateCookie()">更新并启用</button>
+        
+        <div id="result" class="result"></div>
     </div>
 
-    <!-- 使用帮助按钮 -->
-    <button class="help-btn" id="helpBtn">JD_COOKIE获取方法</button>
+    <!-- 帮助按钮 -->
+    <button class="btn btn-secondary help-btn" id="helpBtn">JD_COOKIE 获取方法</button>
 
     <!-- 版权信息 -->
     <div class="copyright">
-        &copy; 2025 <a href="https://github.com/sheetung/ql_JD_COOKIE_UPdate" target="_blank" rel="noopener noreferrer" class="copyright-link">sheetung</a>. All rights reserved.
+        © 2025 <a href="https://github.com/sheetung/jdck_manage_ui" target="_blank" rel="noopener noreferrer">sheetung</a>. All rights reserved.
     </div>
 </div>
 
-<!-- 使用帮助模态框 -->
+<!-- 帮助模态框 -->
 <div id="helpModal" class="modal">
     <div class="modal-content">
-        <span class="close">&times;</span>
-        <h3 class="modal-title">使用帮助</h3>
-        <div class="help-image-container">
-            <!-- 图片链接将在JavaScript中设置 -->
-            <img class="help-image" id="helpImage" alt="">
+        <div class="modal-header">
+            <h3 class="modal-title">使用帮助</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <img class="help-image" id="helpImage" alt="JD_COOKIE 获取方法">
         </div>
     </div>
 </div>
 
 <script>
-    // 页面加载时获取配置信息
+    // 页面加载
     async function loadConfig() {
         try {
             const res = await fetch("/api/config");
@@ -585,14 +734,12 @@
             }
         } catch (err) {
             console.error('加载配置失败:', err);
-            // 使用默认背景图
             document.body.style.backgroundImage = "url('https://t.alcy.cc/ycy')";
         }
     }
-
-    // 立即执行配置加载
     loadConfig();
 
+    // 元素引用
     const updateBtn = document.getElementById("updateBtn");
     const result = document.getElementById("result");
     const queryBtn = document.getElementById("queryBtn");
@@ -600,68 +747,55 @@
     const valueInput = document.getElementById("value");
     const ptpinInput = document.getElementById("ptpin");
 
-    // 初始化结果区域
-    result.style.display = 'none';
-
-    // 标签页切换功能
+    // Tab 切换
     function openTab(evt, tabName) {
-        // 隐藏所有内容
-        const tabContents = document.getElementsByClassName("tab-content");
-        for (let i = 0; i < tabContents.length; i++) {
-            tabContents[i].classList.remove("active");
-        }
-
-        // 移除所有按钮的活动状态
-        const tabBtns = document.getElementsByClassName("tab-btn");
-        for (let i = 0; i < tabBtns.length; i++) {
-            tabBtns[i].classList.remove("active");
-        }
-
-        // 显示当前标签并激活按钮
+        document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+        document.querySelectorAll(".tab-btn").forEach(el => {
+            el.classList.remove("active");
+            el.setAttribute("aria-selected", "false");
+        });
+        
         document.getElementById(tabName).classList.add("active");
         evt.currentTarget.classList.add("active");
+        evt.currentTarget.setAttribute("aria-selected", "true");
 
-        // 重置结果区域
-        if (tabName === 'updateTab') {
-            result.style.display = 'none';
-        } else {
-            queryResult.innerHTML = '';
-        }
+        // 重置结果
+        result.className = "result";
+        queryResult.innerHTML = '';
     }
 
-    // 输入框验证和格式化
+    // 输入处理
     valueInput.addEventListener('input', function() {
-        // 可以在这里添加实时格式化或验证逻辑
         this.value = this.value.trim();
     });
-
     ptpinInput.addEventListener('input', function() {
         this.value = this.value.trim();
     });
 
-    // 更新Cookie功能
+    // 显示结果
+    function showResult(element, type, message) {
+        element.className = `result show result-${type}`;
+        element.innerHTML = message;
+    }
+
+    // 更新 Cookie
     async function updateCookie() {
         const value = valueInput.value.trim();
         
-        // 清空之前的结果
-        result.innerHTML = '';
-        result.classList.remove('result-success', 'result-error', 'result-info');
-        result.style.display = 'none';
+        result.className = "result";
         
-        // 输入验证
         if (!value) {
-            showResult('error', 'JD_COOKIE 不能为空');
+            showResult(result, 'error', 'JD_COOKIE 不能为空');
             return;
         }
         
         if (!value.includes('pt_key=') || !value.includes('pt_pin=')) {
-            showResult('error', 'JD_COOKIE 格式不正确，缺少必要的 pt_key 或 pt_pin 参数');
+            showResult(result, 'error', '格式不正确，缺少 pt_key 或 pt_pin');
             return;
         }
 
-        // 显示加载状态
         updateBtn.disabled = true;
-        showResult('info', '<div class="loading-spinner"></div> 正在提交请求...');
+        showResult(result, 'info', '<span class="loading-spinner"></span>正在提交...');
 
         try {
             const res = await fetch("/api/jdcookie/update", {
@@ -673,131 +807,120 @@
             const data = await res.json();
             
             if (data.code === 200) {
-                showResult('success', data.message);
-                // 成功后可以清空输入框
+                showResult(result, 'success', '✓ ' + data.message);
                 valueInput.value = '';
             } else {
-                showResult('error', data.message);
+                showResult(result, 'error', data.message);
             }
         } catch(err) {
-            showResult('error', `请求异常: ${err.message || '未知错误'}`);
+            showResult(result, 'error', `请求异常: ${err.message || '未知错误'}`);
         } finally {
             updateBtn.disabled = false;
         }
     }
 
-    // 查询Cookie功能
+    // 查询 Cookie
     async function queryCookie() {
         const ptpin = ptpinInput.value.trim();
         
-        // 清空之前的结果
         queryResult.innerHTML = '';
         
-        // 输入验证
         if (!ptpin) {
-            queryResult.innerHTML = `
-                <div class="result-container result-error">
-                    <div class="result-message">pt_pin 不能为空</div>
-                </div>
-            `;
+            queryResult.innerHTML = `<div class="result show result-error">pt_pin 不能为空</div>`;
             return;
         }
 
-        // 显示加载状态
         queryBtn.disabled = true;
-        queryResult.innerHTML = `
-            <div class="result-container result-info">
-                <div class="result-message"><div class="loading-spinner"></div> 正在查询...</div>
-            </div>
-        `;
+        queryResult.innerHTML = `<div class="result show result-info"><span class="loading-spinner"></span>正在查询...</div>`;
 
         try {
             const res = await fetch(`/api/jdcookie/query?ptpin=${encodeURIComponent(ptpin)}`);
             const data = await res.json();
             
             if (data.code === 200) {
-                // 格式化显示查询结果
                 const envInfo = data.data;
-                let statusText = envInfo.status === 0 
-                    ? '<span class="status-badge status-active">已启用</span>' 
+                const statusHtml = envInfo.status === 0 
+                    ? '<span class="status-badge status-active">已启用</span>'
                     : '<span class="status-badge status-inactive">已禁用</span>';
                 
                 queryResult.innerHTML = `
-                    <div class="query-result-container">
-                        <div class="query-result-header">查询结果</div>
-                        <div class="query-item">
-                            <span class="query-label">名称</span>
-                            <span class="query-value">${escapeHTML(envInfo.name)}</span>
+                    <div class="result-card">
+                        <div class="result-card-title">查询结果</div>
+                        <div class="info-row">
+                            <span class="info-label">名称</span>
+                            <span class="info-value">${escapeHTML(envInfo.name)}</span>
                         </div>
-                        <div class="query-item">
-                            <span class="query-label">状态</span>
-                            <span class="query-value">${statusText}</span>
+                        <div class="info-row">
+                            <span class="info-label">状态</span>
+                            <span class="info-value">${statusHtml}</span>
                         </div>
-                        <div class="query-item">
-                            <span class="query-label">备注</span>
-                            <span class="query-value">${escapeHTML(envInfo.remarks || '无')}</span>
+                        <div class="info-row">
+                            <span class="info-label">备注</span>
+                            <span class="info-value">${escapeHTML(envInfo.remarks || '无')}</span>
                         </div>
-                        <div class="query-item">
-                            <span class="query-label">更新时间</span>
-                            <span class="query-value">${formatDate(envInfo.updatedAt) || '未知'}</span>
+                        <div class="info-row">
+                            <span class="info-label">更新时间</span>
+                            <span class="info-value">${formatDate(envInfo.updatedAt) || '未知'}</span>
                         </div>
                     </div>
                     
-                    <div class="query-result-container" style="margin-top: 20px;">
-                        <div class="query-result-header">邮箱通知设置</div>
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <label for="email">邮箱地址:</label>
-                            <input type="email" id="email" placeholder="请输入您的邮箱地址">
+                    <div class="result-card">
+                        <div class="result-card-title">邮箱通知设置</div>
+                        <div class="email-form">
+                            <div class="form-group">
+                                <label for="email">邮箱地址</label>
+                                <input type="email" id="email" placeholder="请输入邮箱地址" value="${escapeHTML(envInfo.email || '')}">
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="emailNotification" ${envInfo.emailNotification ? 'checked' : ''}>
+                                <label for="emailNotification">开启邮件通知</label>
+                            </div>
+                            <button class="btn btn-primary btn-sm mt-4" onclick="bindEmail('${escapeHTML(ptpin)}')">绑定邮箱</button>
                         </div>
-                        <div class="form-group" style="margin-bottom: 15px;">
-                            <input type="checkbox" id="emailNotification" style="margin-right: 10px;">
-                            <label for="emailNotification">开启邮件通知</label>
-                        </div>
-                        <button onclick="bindEmail('${ptpin}')" style="width: 100%; padding: 10px; margin-top: 10px;">绑定邮箱</button>
                     </div>
                 `;
             } else {
-                queryResult.innerHTML = `
-                    <div class="result-container result-error">
-                        <div class="result-message">${escapeHTML(data.message)}</div>
-                    </div>
-                `;
+                queryResult.innerHTML = `<div class="result show result-error">${escapeHTML(data.message)}</div>`;
             }
         } catch(err) {
-            queryResult.innerHTML = `
-                <div class="result-container result-error">
-                    <div class="result-message">请求异常: ${escapeHTML(err.message || '未知错误')}</div>
-                </div>
-            `;
+            queryResult.innerHTML = `<div class="result show result-error">请求异常: ${escapeHTML(err.message || '未知错误')}</div>`;
         } finally {
             queryBtn.disabled = false;
         }
     }
 
-    // 显示结果的辅助函数
-    function showResult(type, message) {
-        result.style.display = 'block';
-        result.classList.remove('result-success', 'result-error', 'result-info');
+    // 绑定邮箱
+    async function bindEmail(ptpin) {
+        const email = document.getElementById('email').value.trim();
+        const emailNotification = document.getElementById('emailNotification').checked;
         
-        switch(type) {
-            case 'success':
-                result.classList.add('result-success');
-                break;
-            case 'error':
-                result.classList.add('result-error');
-                break;
-            case 'info':
-                result.classList.add('result-info');
-                break;
+        if (!email) {
+            queryResult.innerHTML += `<div class="result show result-error mt-4">邮箱地址不能为空</div>`;
+            return;
         }
         
-        result.innerHTML = `<div class="result-message">${message}</div>`;
+        try {
+            const res = await fetch("/api/jdcookie/bind-email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ptpin, email, emailNotification })
+            });
+            
+            const data = await res.json();
+            
+            if (data.code === 200) {
+                queryResult.innerHTML += `<div class="result show result-success mt-4">✓ ${escapeHTML(data.message)}</div>`;
+            } else {
+                queryResult.innerHTML += `<div class="result show result-error mt-4">${escapeHTML(data.message)}</div>`;
+            }
+        } catch(err) {
+            queryResult.innerHTML += `<div class="result show result-error mt-4">请求异常: ${escapeHTML(err.message || '未知错误')}</div>`;
+        }
     }
 
-    // 格式化日期的辅助函数
+    // 工具函数
     function formatDate(dateString) {
         if (!dateString) return null;
-        
         try {
             const date = new Date(dateString);
             return date.toLocaleString('zh-CN', {
@@ -813,7 +936,6 @@
         }
     }
 
-    // HTML转义的辅助函数，防止XSS攻击
     function escapeHTML(text) {
         if (!text) return '';
         const div = document.createElement('div');
@@ -821,79 +943,31 @@
         return div.innerHTML;
     }
 
-    // 使用帮助模态框功能
-    const helpBtn = document.getElementById("helpBtn");
+    // 帮助模态框
     const helpModal = document.getElementById("helpModal");
     const helpImage = document.getElementById("helpImage");
-    const closeBtn = document.getElementsByClassName("close")[0];
+    helpImage.src = "/static/ckhelp.png";
+    helpImage.alt = "JD_COOKIE 获取方法";
 
-    // 设置帮助图片链接（用户后续可以提供实际链接）
-    const helpImageUrl = "/static/ckhelp.png";
-    helpImage.src = helpImageUrl;
-    helpImage.alt = "JD_COOKIE管理系统使用帮助";
+    document.getElementById("helpBtn").onclick = function() {
+        helpModal.classList.add("show");
+    };
 
-    // 打开模态框
-    helpBtn.onclick = function() {
-        helpModal.style.display = "block";
+    function closeModal() {
+        helpModal.classList.remove("show");
     }
 
-    // 关闭模态框
-    closeBtn.onclick = function() {
-        helpModal.style.display = "none";
-    }
-
-    // 点击模态框外部关闭
-    window.onclick = function(event) {
+    helpModal.onclick = function(event) {
         if (event.target === helpModal) {
-            helpModal.style.display = "none";
+            closeModal();
         }
-    }
-    
-    // 绑定邮箱功能
-    async function bindEmail(ptpin) {
-        const email = document.getElementById('email').value.trim();
-        const emailNotification = document.getElementById('emailNotification').checked;
-        
-        // 输入验证
-        if (!email) {
-            queryResult.innerHTML += `
-                <div class="result-container result-error">
-                    <div class="result-message">邮箱地址不能为空</div>
-                </div>
-            `;
-            return;
+    };
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
         }
-        
-        try {
-            const res = await fetch("/api/jdcookie/bind-email", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ptpin, email, emailNotification })
-            });
-            
-            const data = await res.json();
-            
-            if (data.code === 200) {
-                queryResult.innerHTML += `
-                    <div class="result-container result-success">
-                        <div class="result-message">${data.message}</div>
-                    </div>
-                `;
-            } else {
-                queryResult.innerHTML += `
-                    <div class="result-container result-error">
-                        <div class="result-message">${data.message}</div>
-                    </div>
-                `;
-            }
-        } catch(err) {
-            queryResult.innerHTML += `
-                <div class="result-container result-error">
-                    <div class="result-message">请求异常: ${err.message || '未知错误'}</div>
-                </div>
-            `;
-        }
-    }
+    });
 </script>
 
 </body>

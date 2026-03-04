@@ -2,358 +2,647 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>管理员页面 - JD_COOKIE 管理系统</title>
     <style>
-        /* 全局样式 */
+        /* ============ CSS 变量 ============ */
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a6fd6;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            
+            --bg-glass: rgba(255, 255, 255, 0.75);
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --bg-overlay: rgba(0, 0, 0, 0.4);
+            
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            
+            --border-light: rgba(255, 255, 255, 0.6);
+            
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ============ 全局重置 ============ */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
+        html {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+        }
+
         body {
-            font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
-            padding: 20px;
             min-height: 100vh;
+            min-height: 100dvh;
+            padding: 16px;
             position: relative;
+            color: var(--text-primary);
+            line-height: 1.5;
         }
-        
-        /* 背景遮罩层 */
+
         body::before {
             content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.3);
+            position: fixed;
+            inset: 0;
+            background: var(--bg-overlay);
             z-index: -1;
         }
-        
-        /* 容器样式 - 苹果系统风格玻璃透明效果 */
+
+        /* ============ 主容器 ============ */
         .container {
-            max-width: 800px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.6);
+            max-width: 900px;
+            margin: 0 auto;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============ 卡片 ============ */
+        .card {
+            background: var(--bg-glass);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            padding: 30px;
-            border-radius: 18px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            margin: 0 auto;
-            margin-top: 20px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-xl);
+            padding: 24px;
+            margin-bottom: 16px;
         }
-        
-        /* 标题样式 */
-        h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #333;
-            font-size: 24px;
-            font-weight: 600;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        /* 顶部栏样式 */
+
+        /* ============ 顶部栏 ============ */
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            flex-wrap: wrap;
+            gap: 12px;
         }
-        
-        .welcome-message {
-            font-size: 16px;
-            color: #555;
-            font-weight: 500;
-        }
-        
-        .logout-btn {
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .logout-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-        }
-        
-        /* 刷新按钮 */
-        .refresh-btn {
-            padding: 8px 16px;
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
-            border: 1px solid #667eea;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            margin-bottom: 20px;
-        }
-        
-        .refresh-btn:hover {
-            background: #667eea;
-            color: white;
-        }
-        
-        /* 统计信息 */
-        .stats-container {
+
+        .welcome {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            gap: 15px;
+            align-items: center;
+            gap: 12px;
         }
-        
-        .stat-item {
-            flex: 1;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .welcome-text h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .welcome-text p {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 18px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 4px 14px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 0.8125rem;
+        }
+
+        /* ============ 统计卡片 ============ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 16px;
             text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
         }
-        
-        .stat-label {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: #667eea;
-            margin-bottom: 5px;
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
-        
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 1.25rem;
+        }
+
+        .stat-icon.total {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .stat-icon.active {
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .stat-icon.inactive {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
         .stat-value {
-            font-size: 24px;
-            font-weight: 600;
-            color: #333;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
         }
-        
-        /* 表格样式 */
-        .cookie-table {
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ============ 工具栏 ============ */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .toolbar .btn {
+            flex-shrink: 0;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-family: inherit;
+            background: white;
+            transition: var(--transition);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* ============ 数据表格 ============ */
+        .table-container {
+            overflow-x: auto;
+            margin: 0 -24px;
+            padding: 0 24px;
+        }
+
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            margin-top: 8px;
         }
-        
-        .cookie-table th,
-        .cookie-table td {
-            padding: 12px 15px;
+
+        thead {
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+        }
+
+        th {
             text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .cookie-table th {
-            background: rgba(102, 126, 234, 0.1);
+            padding: 12px 16px;
+            font-size: 0.75rem;
             font-weight: 600;
-            color: #555;
-            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            background: rgba(102, 126, 234, 0.06);
+            border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+            white-space: nowrap;
         }
-        
-        .cookie-table tr:hover {
-            background: rgba(102, 126, 234, 0.05);
+
+        td {
+            padding: 14px 16px;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: middle;
         }
-        
-        /* 状态标签样式 */
-        .status-badge {
-            display: inline-block;
+
+        tr:hover td {
+            background: rgba(102, 126, 234, 0.03);
+        }
+
+        .pt-pin {
+            font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+            font-size: 0.8125rem;
+            word-break: break-all;
+        }
+
+        /* 状态标签 */
+        .badge {
+            display: inline-flex;
+            align-items: center;
             padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
+            border-radius: 100px;
+            font-size: 0.6875rem;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
-        
-        .status-active {
-            background-color: #4caf50;
-            color: white;
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: #059669;
         }
-        
-        .status-inactive {
-            background-color: #f44336;
-            color: white;
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #dc2626;
         }
-        
-        /* 加载动画 */
+
+        .badge-info {
+            background: rgba(59, 130, 246, 0.15);
+            color: #2563eb;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* 加载状态 */
+        .loading-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-secondary);
+        }
+
         .loading-spinner {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(102, 126, 234, 0.3);
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(102, 126, 234, 0.2);
             border-radius: 50%;
-            border-top-color: #667eea;
-            animation: spin 1s ease-in-out infinite;
+            border-top-color: var(--primary);
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 12px;
         }
-        
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        
-        /* 结果显示样式 */
-        .result-container {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            background: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+
+        /* ============ 结果提示 ============ */
+        .result {
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            display: none;
         }
-        
+
+        .result.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .result-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #059669;
+        }
+
         .result-error {
-            border-color: rgba(244, 67, 54, 0.5);
-            background: rgba(244, 67, 54, 0.1);
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #dc2626;
         }
-        
-        .result-message {
-            font-size: 14px;
-            line-height: 1.6;
-            text-align: center;
-        }
-        
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
 
-            .container {
-                padding: 20px;
-                margin-top: 10px;
-            }
-
-            h2 {
-                font-size: 20px;
-            }
-            
-            .top-bar {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .stats-container {
-                flex-wrap: wrap;
-            }
-            
-            .stat-item {
-                flex: 1 1 calc(33.333% - 10px);
-                min-width: 100px;
-            }
-            
-            .cookie-table {
-                font-size: 12px;
-            }
-            
-            .cookie-table th,
-            .cookie-table td {
-                padding: 8px 10px;
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        
-        /* 版权信息样式 */
+
+        /* ============ 版权信息 ============ */
         .copyright {
             text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 14px;
-            font-weight: 500;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            padding: 16px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ============ 响应式设计 ============ */
+        @media (max-width: 640px) {
+            body {
+                padding: 12px;
+                padding-top: max(12px, env(safe-area-inset-top));
+                padding-bottom: max(12px, env(safe-area-inset-bottom));
+            }
+
+            .card {
+                padding: 16px;
+                margin-bottom: 12px;
+                border-radius: var(--radius-md);
+            }
+
+            .top-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .welcome {
+                justify-content: center;
+            }
+
+            .top-bar .btn {
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+
+            .stat-card {
+                padding: 12px 8px;
+            }
+
+            .stat-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+
+            .stat-value {
+                font-size: 1.375rem;
+            }
+
+            .stat-label {
+                font-size: 0.625rem;
+            }
+
+            .toolbar {
+                flex-direction: column;
+            }
+
+            .toolbar .btn {
+                width: 100%;
+            }
+
+            .input-group {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .input-group input,
+            .input-group .btn {
+                width: 100%;
+            }
+
+            .table-container {
+                margin: 0 -16px;
+                padding: 0 16px;
+            }
+
+            th, td {
+                padding: 10px 12px;
+                font-size: 0.8125rem;
+            }
+
+            .pt-pin {
+                font-size: 0.75rem;
+            }
+
+            /* 表格横向滚动优化 */
+            table {
+                min-width: 600px;
+            }
+        }
+
+        /* 横屏手机 */
+        @media (max-height: 500px) and (orientation: landscape) {
+            body {
+                padding: 8px;
+            }
+
+            .card {
+                padding: 12px 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .stat-card {
+                padding: 8px;
+            }
+
+            .stat-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 0.875rem;
+            }
+
+            .stat-value {
+                font-size: 1.25rem;
+            }
+
+            .stat-label {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>JD_COOKIE 管理系统 - 管理员页面</h2>
-    
-    <div class="top-bar">
-        <div class="welcome-message">欢迎，管理员</div>
-        <button class="logout-btn" onclick="logout()">登出</button>
-    </div>
-    
-    <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
-        <button class="refresh-btn" onclick="loadCookies()" style="height: 36px;">刷新 COOKIE 列表</button>
-        <input type="email" id="testEmail" placeholder="请输入测试邮箱地址" style="flex: 1; padding: 8px; border: 1px solid #667eea; border-radius: 8px; font-size: 14px; height: 36px;">
-        <button class="refresh-btn" onclick="sendTestEmail()" style="height: 36px;">发送测试邮件</button>
-    </div>
-    
-    <div class="stats-container">
-        <div class="stat-item">
-            <div class="stat-label">总 COOKIE 数</div>
-            <div class="stat-value" id="totalCookies">0</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-label">已启用</div>
-            <div class="stat-value" id="activeCookies">0</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-label">已禁用</div>
-            <div class="stat-value" id="inactiveCookies">0</div>
+    <!-- 顶部栏 -->
+    <div class="card">
+        <div class="top-bar">
+            <div class="welcome">
+                <div class="avatar">管</div>
+                <div class="welcome-text">
+                    <h2>管理员</h2>
+                    <p>JD_COOKIE 管理系统</p>
+                </div>
+            </div>
+            <button class="btn btn-outline" onclick="logout()">登出</button>
         </div>
     </div>
-    
-    <div id="cookieTableContainer" style="overflow-x: auto; margin-top: 20px;">
-        <table class="cookie-table" style="min-width: 800px;">
-            <thead>
-                <tr>
-                    <th style="width: 200px;">pt_pin</th>
-                    <th style="width: 100px;">状态</th>
-                    <th style="width: 150px;">更新时间</th>
-                    <th style="width: 100px;">邮件通知</th>
-                    <th style="flex: 1;">备注</th>
-                </tr>
-            </thead>
-            <tbody id="cookieTableBody">
-                <!-- COOKIE 数据将通过 JavaScript 动态添加 -->
-                <tr>
-                    <td colspan="5" style="text-align: center; padding: 40px;">
-                        <div class="loading-spinner"></div> 正在加载 COOKIE 数据...
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+
+    <!-- 统计信息 -->
+    <div class="card">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon total">📊</div>
+                <div class="stat-value" id="totalCookies">0</div>
+                <div class="stat-label">总数量</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon active">✓</div>
+                <div class="stat-value" id="activeCookies">0</div>
+                <div class="stat-label">已启用</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon inactive">✗</div>
+                <div class="stat-value" id="inactiveCookies">0</div>
+                <div class="stat-label">已禁用</div>
+            </div>
+        </div>
     </div>
-    
-    <div id="result" class="result-container"></div>
-    
-    <!-- 版权信息 -->
+
+    <!-- 工具栏 -->
+    <div class="card">
+        <div class="toolbar">
+            <button class="btn btn-primary btn-sm" onclick="loadCookies()">🔄 刷新列表</button>
+            <div class="input-group">
+                <input type="email" id="testEmail" placeholder="输入测试邮箱地址">
+                <button class="btn btn-outline btn-sm" onclick="sendTestEmail()">发送测试</button>
+            </div>
+        </div>
+        <div id="result" class="result"></div>
+    </div>
+
+    <!-- 数据列表 -->
+    <div class="card">
+        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">COOKIE 列表</h3>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>pt_pin</th>
+                        <th>状态</th>
+                        <th>更新时间</th>
+                        <th>邮件通知</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody id="cookieTableBody">
+                    <tr>
+                        <td colspan="5">
+                            <div class="loading-state">
+                                <div class="loading-spinner"></div>
+                                <div>正在加载数据...</div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 版权 -->
     <div class="copyright">
-        &copy; 2025 sheetung. All rights reserved.
+        © 2025 sheetung. All rights reserved.
     </div>
 </div>
 
 <script>
-    // 页面加载时设置背景图
+    // 加载背景图
     async function loadConfig() {
         try {
             const res = await fetch("/api/config");
@@ -363,15 +652,12 @@
             }
         } catch (err) {
             console.error('加载配置失败:', err);
-            // 使用默认背景图
             document.body.style.backgroundImage = "url('https://t.alcy.cc/ycy')";
         }
     }
-
-    // 立即执行配置加载
     loadConfig();
 
-    // 页面加载时检查登录状态并加载 COOKIE 数据
+    // 页面加载
     window.onload = async function() {
         await checkLoginStatus();
         await loadCookies();
@@ -382,9 +668,7 @@
         try {
             const res = await fetch("/api/admin/check");
             const data = await res.json();
-            
             if (data.code !== 200) {
-                // 未登录，跳转到登录页面
                 window.location.href = "/admin/login";
             }
         } catch (err) {
@@ -411,7 +695,7 @@
         }
     }
 
-    // 渲染 COOKIE 数据到表格
+    // 渲染表格
     async function renderCookies(cookies) {
         const tableBody = document.getElementById("cookieTableBody");
         tableBody.innerHTML = '';
@@ -419,8 +703,11 @@
         if (cookies.length === 0) {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="5" style="text-align: center; padding: 40px;">
-                        暂无 COOKIE 数据
+                    <td colspan="5">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <div>暂无 COOKIE 数据</div>
+                        </div>
                     </td>
                 </tr>
             `;
@@ -442,55 +729,56 @@
         cookies.forEach(cookie => {
             const row = document.createElement('tr');
             
-            // 从 value 中提取 pt_pin
+            // 提取 pt_pin
             let ptPin = '未知';
             const match = cookie.value.match(/pt_pin=([^;]+);?/);
             if (match) {
                 ptPin = match[1];
             }
             
-            // 状态标签
-            let statusBadge = cookie.status === 0 
-                ? '<span class="status-badge status-active">已启用</span>' 
-                : '<span class="status-badge status-inactive">已禁用</span>';
+            // 状态
+            const statusBadge = cookie.status === 0 
+                ? '<span class="badge badge-success">启用</span>'
+                : '<span class="badge badge-danger">禁用</span>';
             
-            // 邮件通知状态
-            let emailNotificationBadge = '<span class="status-badge status-inactive">未开启</span>';
+            // 邮件通知
+            let emailBadge = '<span class="badge badge-danger">未开启</span>';
             if (userConfig[ptPin] && userConfig[ptPin].emailNotification) {
-                emailNotificationBadge = '<span class="status-badge status-active">已开启</span>';
+                emailBadge = '<span class="badge badge-success">已开启</span>';
             }
             
-            // 格式化更新时间
-            const updatedAt = cookie.updatedAt ? new Date(cookie.updatedAt).toLocaleString('zh-CN') : '未知';
+            // 更新时间
+            const updatedAt = cookie.updatedAt 
+                ? new Date(cookie.updatedAt).toLocaleString('zh-CN', { 
+                    year: 'numeric', month: '2-digit', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit'
+                }) 
+                : '未知';
             
             row.innerHTML = `
-                <td>${ptPin}</td>
+                <td><span class="pt-pin">${escapeHTML(ptPin)}</span></td>
                 <td>${statusBadge}</td>
                 <td>${updatedAt}</td>
-                <td>${emailNotificationBadge}</td>
-                <td>${cookie.remarks || '无'}</td>
+                <td>${emailBadge}</td>
+                <td>${escapeHTML(cookie.remarks || '-')}</td>
             `;
             
             tableBody.appendChild(row);
         });
     }
 
-    // 更新统计信息
+    // 更新统计
     function updateStats(cookies) {
         document.getElementById("totalCookies").textContent = cookies.length;
         document.getElementById("activeCookies").textContent = cookies.filter(c => c.status === 0).length;
         document.getElementById("inactiveCookies").textContent = cookies.filter(c => c.status === 1).length;
     }
 
-    // 登出功能
+    // 登出
     async function logout() {
         try {
-            const res = await fetch("/api/admin/logout", {
-                method: "POST"
-            });
-            
+            const res = await fetch("/api/admin/logout", { method: "POST" });
             const data = await res.json();
-            
             if (data.code === 200) {
                 window.location.href = "/admin/login";
             }
@@ -499,29 +787,16 @@
         }
     }
 
-    // 显示结果的辅助函数
-    function showResult(type, message) {
-        const result = document.getElementById("result");
-        result.style.display = 'block';
-        result.classList.remove('result-error');
-        
-        if (type === 'error') {
-            result.classList.add('result-error');
-        }
-        
-        result.innerHTML = `<div class="result-message">${message}</div>`;
-        
-        // 3秒后自动隐藏
-        setTimeout(() => {
-            result.style.display = 'none';
-        }, 3000);
-    }
-    
     // 发送测试邮件
     async function sendTestEmail() {
+        const testEmail = document.getElementById('testEmail').value.trim();
+        
+        if (!testEmail) {
+            showResult('error', '请输入邮箱地址');
+            return;
+        }
+        
         try {
-            const testEmail = document.getElementById('testEmail').value.trim();
-            
             const res = await fetch("/api/admin/email/test", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -531,7 +806,7 @@
             const data = await res.json();
             
             if (data.code === 200) {
-                showResult('success', '测试邮件发送成功');
+                showResult('success', '✓ 测试邮件发送成功');
             } else {
                 showResult('error', data.message);
             }
@@ -539,6 +814,25 @@
             console.error('发送测试邮件失败:', err);
             showResult('error', `发送失败: ${err.message || '未知错误'}`);
         }
+    }
+
+    // 显示结果
+    function showResult(type, message) {
+        const result = document.getElementById("result");
+        result.className = `result show result-${type}`;
+        result.textContent = message;
+        
+        setTimeout(() => {
+            result.className = "result";
+        }, 3000);
+    }
+
+    // HTML转义
+    function escapeHTML(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 </script>
 
