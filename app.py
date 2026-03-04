@@ -312,6 +312,10 @@ def check_cookies_expiry():
         if not config.get('enabled'):
             return
         
+        # 重新加载用户配置，确保获取最新的邮箱和通知设置
+        global USER_CONFIG
+        USER_CONFIG = load_user_config()
+        
         # 获取所有 JD_COOKIE
         token = get_ql_token()
         headers = {"Authorization": f"Bearer {token}"}
@@ -322,6 +326,9 @@ def check_cookies_expiry():
             return
         
         envs = envs_data.get("data", [])
+        
+        # 创建上海时区对象（东八区，UTC+8）
+        shanghai_timezone = datetime.timezone(datetime.timedelta(hours=8))
         
         # 检查每个COOKIE是否到期（这里简化处理，实际需要根据COOKIE的有效期判断）
         for env in envs:
@@ -344,21 +351,23 @@ def check_cookies_expiry():
                 continue
             
             # 检查COOKIE是否过期（这里简化处理，实际需要根据COOKIE的有效期判断）
-            # 假设超过7天未更新的COOKIE视为过期
+            # 假设超过1天未更新的COOKIE视为过期
             updated_at = env.get('updatedAt')
             if updated_at:
-                updated_time = datetime.datetime.fromisoformat(updated_at.replace('Z', '+00:00'))
-                current_time = datetime.datetime.now(datetime.timezone.utc)
+                # 将UTC时间转换为上海时区
+                updated_time = datetime.datetime.fromisoformat(updated_at.replace('Z', '+00:00')).astimezone(shanghai_timezone)
+                current_time = datetime.datetime.now(shanghai_timezone)
                 days_diff = (current_time - updated_time).days
                 
                 if days_diff >= 1:
                     # 发送邮件提醒
                     subject = "JD_COOKIE 到期提醒"
                     update_url = CONFIG.get('server', {}).get('updateUrl', 'http://localhost:8082')
-                    body = f"尊敬的用户，您的 JD_COOKIE (pt_pin: {pt_pin}) 已超过3天未更新，可能已过期，请及时更新。\n\n"
+                    body = f"尊敬的用户，您的 JD_COOKIE (pt_pin: {pt_pin}) 已超过1天未更新，可能已过期，请及时更新。\n\n"
                     body += f"更新链接: {update_url}\n\n"
                     body += "如需关闭提醒，请登录系统后在邮箱通知设置中关闭邮件通知。"
-                    send_email(email, subject, body)
+                    result, message = send_email(email, subject, body)
+                    print(f"发送邮件结果: {result}, {message}")
     except Exception as e:
         print(f"检查COOKIE到期失败: {e}")
 
@@ -449,6 +458,13 @@ def query_jdcookie():
         if not target_env:
             return jsonify({"code": 404, "message": "未找到对应 pt_pin 的 JD_COOKIE"})
 
+        # 获取用户配置，包括邮箱和邮件通知状态
+        user_config = {}
+        if USER_CONFIG and isinstance(USER_CONFIG, dict):
+            user_config = USER_CONFIG.get('users', {}).get(ptpin, {})
+        email = user_config.get('email', '')
+        emailNotification = user_config.get('emailNotification', False)
+        
         # 返回环境变量的所有状态信息
         env_info = {
             "id": target_env["id"],
@@ -456,7 +472,9 @@ def query_jdcookie():
             "value": target_env["value"],
             "remarks": target_env.get("remarks", ""),
             "status": target_env.get("status", 1),  # 0: 启用, 1: 禁用
-            "updatedAt": target_env.get("updatedAt", "")
+            "updatedAt": target_env.get("updatedAt", ""),
+            "email": email,
+            "emailNotification": emailNotification
         }
         
         return jsonify({"code": 200, "message": "查询成功", "data": env_info})
@@ -600,9 +618,12 @@ def bind_email():
         subject = "邮箱绑定成功通知"
         update_url = CONFIG.get('server', {}).get('updateUrl', 'http://localhost:8082')
         body = f"尊敬的用户，您的邮箱 {email} 已成功绑定到 JD_COOKIE (pt_pin: {ptpin})。\n\n"
-        body += "当您的 JD_COOKIE 过期时，系统将通过此邮箱发送提醒通知。\n\n"
+        if emailNotification:
+            body += "邮件通知已开启，当您的 JD_COOKIE 过期时，系统将通过此邮箱发送提醒通知。\n\n"
+        else:
+            body += "邮件通知已关闭，系统不会通过此邮箱发送过期提醒通知。\n\n"
         body += f"更新链接: {update_url}\n\n"
-        body += "如需关闭提醒，请登录系统后在邮箱通知设置中关闭邮件通知。"
+        body += "如需修改邮件通知设置，请登录系统后在邮箱通知设置中进行调整。"
         send_email(email, subject, body)
         
         return jsonify({"code": 200, "message": "邮箱绑定成功，已发送测试邮件"})

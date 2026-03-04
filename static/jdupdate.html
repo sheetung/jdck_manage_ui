@@ -869,10 +869,10 @@
                         <div class="email-form">
                             <div class="form-group">
                                 <label for="email">邮箱地址</label>
-                                <input type="email" id="email" placeholder="请输入邮箱地址">
+                                <input type="email" id="email" placeholder="请输入邮箱地址" value="${escapeHTML(envInfo.email || '')}">
                             </div>
                             <div class="checkbox-group">
-                                <input type="checkbox" id="emailNotification">
+                                <input type="checkbox" id="emailNotification" ${envInfo.emailNotification ? 'checked' : ''}>
                                 <label for="emailNotification">开启邮件通知</label>
                             </div>
                             <button class="btn btn-primary btn-sm mt-4" onclick="bindEmail('${escapeHTML(ptpin)}')">绑定邮箱</button>
