@@ -350,6 +350,12 @@ def check_cookies_expiry():
             if not email or not emailNotification:
                 continue
             
+            # 检查COOKIE是否已启用
+            status = env.get('status', 1)  # 0: 启用, 1: 禁用
+            if status == 0:
+                # COOKIE已启用，不需要发送提醒
+                continue
+            
             # 检查COOKIE是否过期（这里简化处理，实际需要根据COOKIE的有效期判断）
             # 假设超过1天未更新的COOKIE视为过期
             updated_at = env.get('updatedAt')

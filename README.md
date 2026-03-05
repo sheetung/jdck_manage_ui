@@ -93,8 +93,7 @@ cp user_config.yaml.example user_config.yaml
 #### 2. 构建并启动
 
 ```sh
-docker build -t jdupdate .
-docker compose up -d
+docker compose up -d --build
 ```
 
 #### 3. 查看日志
