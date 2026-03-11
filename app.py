@@ -90,6 +90,42 @@ def save_user_config(user_config):
         print(f"保存用户配置文件失败: {e}")
         return False
 
+# 加载通知配置
+def load_notification_config():
+    default_notification_config = {
+        "notification": {
+            "content": "",
+            "enabled": False
+        }
+    }
+    
+    if os.path.exists(USER_CONFIG_FILE):
+        try:
+            with open(USER_CONFIG_FILE, 'r', encoding='utf-8') as f:
+                config = yaml.safe_load(f)
+                # 确保返回的配置包含notification键
+                if config and isinstance(config, dict):
+                    if 'notification' not in config:
+                        config['notification'] = default_notification_config['notification']
+                    return config
+        except Exception as e:
+            print(f"加载通知配置失败: {e}")
+    # 如果文件不存在或加载失败，返回默认配置
+    return default_notification_config
+
+# 保存通知配置
+def save_notification_config(notification_config):
+    try:
+        # 先加载现有配置
+        user_config = load_user_config()
+        # 更新通知配置
+        user_config['notification'] = notification_config
+        # 保存配置
+        return save_user_config(user_config)
+    except Exception as e:
+        print(f"保存通知配置失败: {e}")
+        return False
+
 # 全局用户配置
 USER_CONFIG = load_user_config()
 
@@ -423,6 +459,82 @@ def get_config():
             "backgroundImageUrl": BACKGROUND_IMAGE_URL
         }
     })
+
+@app.route("/api/notification", methods=["GET"])
+def get_notification():
+    """返回通知配置"""
+    try:
+        config = load_notification_config()
+        notification = config.get('notification', {})
+        return jsonify({
+            "code": 200,
+            "data": notification
+        })
+    except Exception as e:
+        return jsonify({"code": 500, "message": str(e)})
+
+@app.route("/api/notification", methods=["POST"])
+def update_notification():
+    """更新通知配置"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"code": 400, "message": "请求数据不能为空"})
+        
+        content = data.get('content', '')
+        enabled = data.get('enabled', False)
+        
+        notification_config = {
+            "content": content,
+            "enabled": enabled
+        }
+        
+        if save_notification_config(notification_config):
+            return jsonify({"code": 200, "message": "通知配置更新成功"})
+        else:
+            return jsonify({"code": 500, "message": "通知配置更新失败"})
+    except Exception as e:
+        return jsonify({"code": 500, "message": str(e)})
+
+@app.route("/api/admin/notification", methods=["GET"])
+def get_admin_notification():
+    """管理员获取通知配置"""
+    try:
+        config = load_notification_config()
+        notification = config.get('notification', {})
+        return jsonify({
+            "code": 200,
+            "data": notification
+        })
+    except Exception as e:
+        return jsonify({"code": 500, "message": str(e)})
+
+@app.route("/api/admin/notification", methods=["POST"])
+def update_admin_notification():
+    """管理员更新通知配置"""
+    try:
+        # 检查登录状态
+        if not session.get('admin_logged_in'):
+            return jsonify({"code": 401, "message": "未登录"})
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({"code": 400, "message": "请求数据不能为空"})
+        
+        content = data.get('content', '')
+        enabled = data.get('enabled', False)
+        
+        notification_config = {
+            "content": content,
+            "enabled": enabled
+        }
+        
+        if save_notification_config(notification_config):
+            return jsonify({"code": 200, "message": "通知配置更新成功"})
+        else:
+            return jsonify({"code": 500, "message": "通知配置更新失败"})
+    except Exception as e:
+        return jsonify({"code": 500, "message": str(e)})
 
 @app.route("/api/envs", methods=["GET"])
 def get_envs():

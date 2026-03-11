@@ -723,6 +723,20 @@
     </div>
 </div>
 
+<!-- 通知弹窗 -->
+<div id="notificationModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">系统通知</h3>
+            <button class="modal-close" onclick="closeNotification()">&times;</button>
+        </div>
+        <div class="modal-body" id="notificationBody"></div>
+        <div class="modal-header">
+            <button class="btn btn-primary" onclick="closeNotification()" style="width: 100%;">确定</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // 页面加载
     async function loadConfig() {
@@ -738,6 +752,42 @@
         }
     }
     loadConfig();
+    
+    // 检查通知
+    async function checkNotification() {
+        try {
+            const res = await fetch("/api/notification");
+            const data = await res.json();
+            if (data.code === 200) {
+                const notification = data.data;
+                if (notification.enabled && notification.content) {
+                    showNotification(notification.content);
+                }
+            }
+        } catch (err) {
+            console.error('检查通知失败:', err);
+        }
+    }
+    
+    // 显示通知
+    function showNotification(content) {
+        const notificationModal = document.getElementById('notificationModal');
+        const notificationBody = document.getElementById('notificationBody');
+        notificationBody.textContent = content;
+        notificationModal.classList.add('show');
+    }
+    
+    // 关闭通知
+    function closeNotification() {
+        const notificationModal = document.getElementById('notificationModal');
+        notificationModal.classList.remove('show');
+    }
+    
+    // 页面加载时检查通知
+    window.onload = function() {
+        loadConfig();
+        checkNotification();
+    };
 
     // 元素引用
     const updateBtn = document.getElementById("updateBtn");
