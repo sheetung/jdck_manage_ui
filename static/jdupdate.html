@@ -759,8 +759,8 @@
             const res = await fetch("/api/notification");
             const data = await res.json();
             if (data.code === 200) {
-                const notification = data.data;
-                if (notification.enabled && notification.content) {
+                const notification = data.data || {};
+                if ((notification.enabled === true || notification.enabled === 'true') && notification.content) {
                     showNotification(notification.content);
                 }
             }
@@ -788,6 +788,11 @@
         loadConfig();
         checkNotification();
     };
+
+    // 兜底：确保通知检查执行
+    document.addEventListener('DOMContentLoaded', function() {
+        checkNotification();
+    });
 
     // 元素引用
     const updateBtn = document.getElementById("updateBtn");

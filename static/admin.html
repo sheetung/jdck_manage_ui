@@ -756,9 +756,10 @@
             const res = await fetch("/api/admin/notification");
             const data = await res.json();
             if (data.code === 200) {
-                const notification = data.data;
+                const notification = data.data || {};
                 document.getElementById('notificationContent').value = notification.content || '';
-                document.getElementById('notificationEnabled').checked = notification.enabled || false;
+                const enabled = notification.enabled;
+                document.getElementById('notificationEnabled').checked = (enabled === true || enabled === 'true');
             }
         } catch (err) {
             console.error('加载通知配置失败:', err);
@@ -784,7 +785,7 @@
             if (data.code === 200) {
                 showResult('notificationResult', 'success', '✓ 通知配置保存成功');
             } else {
-                showResult('notificationResult', 'error', data.message);
+                showResult('notificationResult', 'error', data.message || '保存失败');
             }
         } catch (err) {
             console.error('保存通知配置失败:', err);
