@@ -768,12 +768,17 @@
             console.error('检查通知失败:', err);
         }
     }
+
+    // 调试：临时在控制台输出通知内容
+    // console.log('[notification]', notification);
     
     // 显示通知
     function showNotification(content) {
         const notificationModal = document.getElementById('notificationModal');
         const notificationBody = document.getElementById('notificationBody');
-        notificationBody.textContent = content;
+        notificationBody.textContent = content || '';
+        // 兜底渲染：同步设置属性，避免某些浏览器/样式下 textContent 不显示
+        notificationBody.innerText = notificationBody.textContent;
         notificationModal.classList.add('show');
     }
     
