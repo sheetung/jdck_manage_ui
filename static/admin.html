@@ -141,6 +141,83 @@
             color: var(--text-muted);
         }
 
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .section-title h3 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .section-subtitle {
+            margin-top: 4px;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+
+        .notification-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .switch input {
+            display: none;
+        }
+
+        .slider {
+            width: 44px;
+            height: 24px;
+            background: rgba(102, 126, 234, 0.25);
+            border-radius: 999px;
+            position: relative;
+            transition: var(--transition);
+            box-shadow: inset 0 0 0 1px rgba(102, 126, 234, 0.25);
+        }
+
+        .slider::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .switch input:checked + .slider {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .switch input:checked + .slider::after {
+            transform: translateX(20px);
+        }
+
+        .switch-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -652,16 +729,22 @@
 
     <!-- 通知设置 -->
     <div class="card">
-        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">通知设置</h3>
+        <div class="section-title">
+            <div>
+                <h3>通知设置</h3>
+                <p class="section-subtitle">配置首页弹窗内容与开关</p>
+            </div>
+        </div>
         <div class="form-group">
             <label for="notificationContent">通知内容</label>
-            <textarea id="notificationContent" rows="4" placeholder="请输入弹出通知内容，当内容不为空时，用户访问首页会看到此通知"></textarea>
+            <textarea id="notificationContent" rows="5" placeholder="请输入弹出通知内容，当内容不为空时，用户访问首页会看到此通知"></textarea>
         </div>
-        <div class="checkbox-group">
-            <input type="checkbox" id="notificationEnabled">
-            <label for="notificationEnabled">启用通知</label>
-        </div>
-        <div class="mt-4">
+        <div class="notification-actions">
+            <label class="switch">
+                <input type="checkbox" id="notificationEnabled">
+                <span class="slider"></span>
+                <span class="switch-label">启用通知</span>
+            </label>
             <button class="btn btn-primary btn-sm" onclick="saveNotification()">保存通知设置</button>
         </div>
         <div id="notificationResult" class="result"></div>

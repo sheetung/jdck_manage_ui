@@ -81,7 +81,7 @@
         /* ============ 主容器 ============ */
         .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 720px;
             background: var(--bg-glass);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -459,7 +459,7 @@
             position: fixed;
             inset: 0;
             z-index: 1000;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.55);
             overflow: auto;
             animation: fadeIn 0.2s ease;
         }
@@ -473,9 +473,12 @@
 
         .modal-content {
             position: relative;
-            background: #1f2937;
+            background: rgba(255, 255, 255, 0.95);
             border-radius: var(--radius-lg);
-            max-width: 90vw;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: var(--shadow-xl);
+            max-width: 720px;
+            width: min(92vw, 720px);
             max-height: 90vh;
             overflow: hidden;
             animation: scaleIn 0.3s ease;
@@ -497,19 +500,19 @@
             align-items: center;
             justify-content: space-between;
             padding: 16px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.15);
         }
 
         .modal-title {
             font-size: 1.125rem;
             font-weight: 600;
-            color: #f3f4f6;
+            color: var(--text-primary);
         }
 
         .modal-close {
             background: none;
             border: none;
-            color: #9ca3af;
+            color: var(--text-muted);
             font-size: 1.5rem;
             cursor: pointer;
             padding: 4px;
@@ -519,14 +522,14 @@
         }
 
         .modal-close:hover {
-            color: white;
+            color: var(--primary);
         }
 
         .modal-body {
             padding: 20px;
             overflow: auto;
             max-height: calc(90vh - 60px);
-            color: #f3f4f6;
+            color: var(--text-primary);
             white-space: pre-wrap;
         }
 
